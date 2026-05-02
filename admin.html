@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Sky Electrofab Solar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #22c55e;
+            --dark-blue: #0f172a;
+            --bg-light: #f1f5f9;
+            --white: #ffffff;
+            --border: #e2e8f0;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); margin: 0; color: #334155; }
+        .sidebar { width: 250px; background: linear-gradient(180deg, #0f172a, #1e293b); color: white; position: fixed; top: 0; bottom: 0; padding: 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.1); z-index: 100;}
+        .sidebar h2 { color: var(--primary-green); font-size: 1.5rem; margin-bottom: 30px; display: flex; align-items: center; gap: 10px;}
+        .nav-item { padding: 14px 18px; cursor: pointer; border-radius: 10px; margin-bottom: 12px; transition: all 0.3s ease; font-weight: 500; display: flex; align-items: center;}
+        .nav-item.active, .nav-item:hover { background: rgba(255,255,255,0.15); color: var(--primary-green); transform: translateX(5px); }
+        .nav-item i { width: 30px; font-size: 1.1rem; }
+        .main-content { margin-left: 290px; padding: 40px; }
+        .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 30px; border: 1px solid rgba(226, 232, 240, 0.8); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; font-weight: 600; color: var(--dark-blue); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;}
+        tr:last-child td { border-bottom: none; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: 600; transition: all 0.3s; font-size: 0.95rem; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-green { background: var(--primary-green); }
+        .btn-blue { background: var(--dark-blue); }
+        .logout { position: absolute; bottom: 20px; color: #ef4444; cursor: pointer; font-weight: 500; padding: 12px 15px; width: 220px;}
+        .logout:hover { background: rgba(239, 68, 68, 0.1); border-radius: 6px;}
+        .tab-content { display: none; animation: fadeIn 0.3s ease;}
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--dark-blue);}
+        .form-group input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-family: 'Inter';}
+        .form-group input:focus { outline: none; border-color: var(--primary-green); }
+        
+        /* Grid Cards */
+        .customers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 20px;}
+        .customer-card-box { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.04); overflow: hidden; border: 1px solid rgba(226, 232, 240, 0.8); transition: transform 0.3s ease, box-shadow 0.3s ease;}
+        .customer-card-box:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
+        .customer-card-header { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 25px; position: relative;}
+        .customer-card-header h3 { margin: 0; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.5px;}
+        .customer-card-header p { margin: 8px 0 0 0; font-size: 0.9rem; opacity: 0.85;}
+        .customer-id-badge { position: absolute; top: 25px; right: 25px; background: rgba(255,255,255,0.15); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; backdrop-filter: blur(4px);}
+        .customer-card-body { padding: 15px 25px 25px 25px; display: none; grid-template-columns: 1fr; gap: 10px; max-height: 450px; overflow-y: auto;}
+        .customer-card-body.open { display: grid; animation: fadeIn 0.3s ease;}
+        .toggle-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; margin-top: 20px; font-size: 0.9rem; width: 100%; transition: all 0.3s ease; text-align: center; font-weight: 500; box-sizing: border-box;}
+        .toggle-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px);}
+        .step-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;}
+        .step-row:hover { background: #f1f5f9; border-color: #cbd5e1;}
+        .step-row:last-child { margin-bottom: 0; }
+        .step-row label { font-size: 0.85rem; font-weight: 600; color: #334155; width: 55%; line-height: 1.3;}
+        .status-dropdown { width: 40%; font-size: 0.8rem; padding: 6px; border-radius: 6px; cursor: pointer; outline: none; transition: 0.2s;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 20px; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+        .summary-boxes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+        .summary-box { background: var(--bg-light); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .summary-box h4 { margin: 0 0 5px 0; font-size: 0.8rem; color: #64748b; }
+        .summary-box p { margin: 0; font-size: 1.2rem; font-weight: bold; color: var(--dark-blue); }
+        .payment-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .payment-table th, .payment-table td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9rem; }
+        
+        /* Mobile Menubar */
+        .mobile-header { display: none; background: var(--dark-blue); color: white; padding: 15px 20px; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .mobile-header h2 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; color: var(--primary-green); }
+        .menu-toggle { font-size: 1.5rem; cursor: pointer; color: white; }
+        .close-sidebar { display: none; position: absolute; right: 20px; top: 25px; cursor: pointer; font-size: 1.5rem; color: white; }
+
+        @media (max-width: 768px) {
+            .mobile-header { display: flex; }
+            .sidebar { transform: translateX(-100%); z-index: 100; transition: transform 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
+            .sidebar.show { transform: translateX(0); }
+            .close-sidebar { display: block; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <h2 style="display: flex; align-items: center; gap: 10px; margin: 0;"><img src="images/logo.png" alt="Logo" style="height: 45px;"> Admin Panel</h2>
+        <i class="fas fa-bars menu-toggle" onclick="toggleSidebar()"></i>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <i class="fas fa-times close-sidebar" onclick="toggleSidebar()"></i>
+        <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px;"><img src="images/logo.png" alt="Logo" style="height: 55px; border-radius: 4px;"> Admin</h2>
+        <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Dashboard</div>
+        <div class="nav-item" onclick="switchTab('enquiries')"><i class="fas fa-inbox"></i> Enquiries</div>
+        <div class="nav-item" onclick="switchTab('customers')"><i class="fas fa-tasks"></i> Project Progress</div>
+        <div class="nav-item" onclick="switchTab('portfolio')"><i class="fas fa-images"></i> Manage Portfolio</div>
+        <div class="nav-item" onclick="switchTab('branch-payments')"><i class="fas fa-money-bill-wave"></i> Branch Payments</div>
+        <div class="nav-item" onclick="switchTab('quotations')"><i class="fas fa-file-invoice"></i> Quotation Maker</div>
+        <div class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard Home Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2 style="color: var(--dark-blue);">Dashboard Overview</h2>
+            <div class="customers-grid">
+                <div class="customer-card-box" onclick="switchTab('enquiries')" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s; background: linear-gradient(135deg, #0f172a, #1e293b); color: white;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 20px;"></i>
+                    <h3 style="margin: 0; font-size: 1.5rem;">Website Enquiries</h3>
+                    <p style="opacity: 0.8; margin-top: 10px;">Manage incoming leads</p>
+                </div>
+                <div class="customer-card-box" onclick="switchTab('customers')" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s; background: linear-gradient(135deg, #0f172a, #1e293b); color: white;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-tasks" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 20px;"></i>
+                    <h3 style="margin: 0; font-size: 1.5rem;">Project Progress</h3>
+                    <p style="opacity: 0.8; margin-top: 10px;">Track customer steps</p>
+                </div>
+                <div class="customer-card-box" onclick="switchTab('portfolio')" style="cursor: pointer; text-align: center; padding: 40px 20px; transition: transform 0.2s; background: linear-gradient(135deg, #0f172a, #1e293b); color: white;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fas fa-images" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 20px;"></i>
+                    <h3 style="margin: 0; font-size: 1.5rem;">Manage Portfolio</h3>
+                    <p style="opacity: 0.8; margin-top: 10px;">Upload recent projects</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enquiries Tab -->
+        <div id="enquiries" class="tab-content">
+            <h2 style="color: var(--dark-blue);">Website Enquiries</h2>
+            <div id="enquiries-grid" class="customers-grid">
+                <!-- Populated by JS -->
+            </div>
+
+            <h2 style="color: var(--dark-blue); margin-top: 40px;">Create Customer Login</h2>
+            <div class="card" style="max-width: 500px;">
+                <form id="create-customer-form">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="c-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="c-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Branch Name</label>
+                        <select id="c-branch" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter';">
+                            <option value="">-- Select Branch --</option>
+                            <option value="Nashik Branch">Nashik Branch</option>
+                            <option value="Pune Branch">Pune Branch</option>
+                            <option value="Chalisgaon Branch">Chalisgaon Branch</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign Username</label>
+                        <input type="text" id="c-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign Password</label>
+                        <input type="text" id="c-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-green" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 10px;">Create Customer & Start Project</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Customers Tab -->
+        <div id="customers" class="tab-content">
+            <h2 style="color: var(--dark-blue);">Customer Project Management</h2>
+            <div id="customers-grid" class="customers-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Portfolio Tab -->
+        <div id="portfolio" class="tab-content">
+            <h2 style="color: var(--dark-blue);">Manage Portfolio Projects</h2>
+            <div class="card" style="max-width: 600px;">
+                <h3>Add New Project Image</h3>
+                <form id="add-project-form">
+                    <div class="form-group">
+                        <label>Project Title</label>
+                        <input type="text" id="p-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description / Capacity</label>
+                        <input type="text" id="p-desc" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Image</label>
+                        <input type="file" id="p-image" accept="image/*" required style="padding: 10px 0;">
+                    </div>
+                    <button type="submit" class="btn btn-green" style="width: 100%; padding: 12px; margin-top: 10px;">Upload Project</button>
+                </form>
+            </div>
+
+            <h3 style="margin-top: 40px;">Current Projects</h3>
+            <div id="portfolio-grid" class="customers-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+        <!-- Branch Payments Tab -->
+        <div id="branch-payments" class="tab-content">
+            <h2 style="color: var(--dark-blue);">Branch-Wise Payment Management</h2>
+            <div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                <label style="font-weight: bold; color: var(--dark-blue);">Select Branch:</label>
+                <select id="branch-select" class="status-dropdown" style="width: 250px; font-size: 1rem; border: 1px solid var(--border);" onchange="loadBranchPayments()">
+                    <option value="All">All Branches</option>
+                </select>
+            </div>
+            
+            <div class="summary-boxes" id="branch-summary">
+                <div class="summary-box">
+                    <h4>Total Pending Balance (Overall)</h4>
+                    <p id="branch-pending-total" style="color: #ef4444;">₹0</p>
+                </div>
+                <div class="summary-box">
+                    <h4>Total Cost (Overall)</h4>
+                    <p id="branch-cost-total" style="color: var(--dark-blue);">₹0</p>
+                </div>
+                <div class="summary-box">
+                    <h4>Total Paid (Overall)</h4>
+                    <p id="branch-paid-total" style="color: var(--primary-green);">₹0</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: var(--dark-blue);">Accounts with Pending Cash/Balances</h3>
+            <table class="payment-table" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <thead style="background: var(--dark-blue); color: white;">
+                    <tr>
+                        <th style="padding: 15px;">Customer Name</th>
+                        <th style="padding: 15px;">Branch</th>
+                        <th style="padding: 15px;">Total Cost</th>
+                        <th style="padding: 15px;">Total Paid</th>
+                        <th style="padding: 15px; background: #ef4444;">Pending Amount</th>
+                        <th style="padding: 15px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="branch-payments-body">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Quotations Tab -->
+        <div id="quotations" class="tab-content">
+            <h2 style="color: var(--dark-blue);">Quotation Maker</h2>
+            <p style="color: #64748b; margin-bottom: 30px;">Generate a professional standalone quotation for a prospective solar project.</p>
+            
+            <div class="card" style="max-width: 900px;">
+                <form id="quotation-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Client Details -->
+                    <div style="grid-column: span 2; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px;">
+                        <h3 style="color: var(--dark-blue); font-size: 1.1rem; margin: 0;">1. Client Details</h3>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Client Name</label>
+                        <input type="text" id="q-name" required placeholder="e.g. Ramesh Patel">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Contact Number</label>
+                        <input type="text" id="q-phone" required placeholder="e.g. +91 9876543210">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2; margin: 0;">
+                        <label>Site Address</label>
+                        <input type="text" id="q-address" required placeholder="e.g. 123 Ashoka Marg, Nashik">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Quotation Date</label>
+                        <input type="date" id="q-date" required>
+                    </div>
+
+                    <!-- System Specifications -->
+                    <div style="grid-column: span 2; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 20px; margin-bottom: 10px;">
+                        <h3 style="color: var(--dark-blue); font-size: 1.1rem; margin: 0;">2. System Specifications</h3>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>System Capacity (kW)</label>
+                        <input type="number" step="0.1" id="q-capacity" required placeholder="e.g. 3">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Solar Panel Type</label>
+                        <input type="text" id="q-panel" required placeholder="e.g. Mono PERC 540Wp (Topcon)">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Inverter Type</label>
+                        <input type="text" id="q-inverter" required placeholder="e.g. 3kW On-Grid String Inverter">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Structure / Module</label>
+                        <input type="text" id="q-structure" value="GI Structure (Hot Dip Galvanized)" required>
+                    </div>
+
+                    <!-- Pricing Details -->
+                    <div style="grid-column: span 2; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 20px; margin-bottom: 10px;">
+                        <h3 style="color: var(--dark-blue); font-size: 1.1rem; margin: 0;">3. Pricing Details</h3>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Total System Cost (₹)</label>
+                        <input type="number" id="q-base-price" required placeholder="e.g. 165000">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Expected Subsidy (₹)</label>
+                        <input type="number" id="q-subsidy" value="0" placeholder="e.g. 78000">
+                    </div>
+
+                    <button type="button" onclick="generateQuotation()" class="btn btn-green" style="grid-column: span 2; padding: 15px; font-size: 1.1rem; margin-top: 20px;">
+                        <i class="fas fa-file-pdf"></i> Generate & Print Quotation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <i class="fas fa-times close-modal" onclick="closePaymentModal()"></i>
+            <h2 style="color: var(--dark-blue); margin-top: 0;">Payment Management</h2>
+            <p style="margin: 0 0 20px 0; color: #64748b;" id="payment-customer-name">Customer: --</p>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">Total Project Cost (₹)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="total-cost-input" style="flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 4px;" placeholder="e.g. 150000">
+                    <button class="btn btn-blue" onclick="saveTotalCost()">Save Cost</button>
+                </div>
+            </div>
+
+            <div class="summary-boxes">
+                <div class="summary-box">
+                    <h4>Total Cost</h4>
+                    <p id="sum-cost">₹0</p>
+                </div>
+                <div class="summary-box">
+                    <h4>Total Paid</h4>
+                    <p id="sum-paid" style="color: var(--primary-green);">₹0</p>
+                </div>
+                <div class="summary-box">
+                    <h4>Remaining</h4>
+                    <p id="sum-rem" style="color: #ef4444;">₹0</p>
+                </div>
+            </div>
+            
+            <div style="font-size: 0.85rem; margin-bottom: 20px; color: #64748b; text-align: center;">
+                Paid in Cash: <strong id="sum-cash">₹0</strong> &nbsp;|&nbsp; Paid in Bank: <strong id="sum-bank">₹0</strong>
+            </div>
+
+            <h3 style="font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Add New Payment</h3>
+            <form id="add-payment-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group" style="margin: 0;">
+                    <label>Amount (₹)</label>
+                    <input type="number" id="pay-amount" required>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label>Payment Mode</label>
+                    <select id="pay-mode" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-family: 'Inter';" required>
+                        <option value="Bank/Online">Bank Transfer / UPI</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin: 0; grid-column: span 2;">
+                    <label>Description / Trxn ID</label>
+                    <input type="text" id="pay-desc" placeholder="Optional notes">
+                </div>
+                <button type="submit" class="btn btn-green" style="grid-column: span 2; padding: 12px;">Add Payment</button>
+            </form>
+
+            <h3 style="font-size: 1.1rem; margin-top: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Payment History</h3>
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Notes</th>
+                        <th>Receipt</th>
+                    </tr>
+                </thead>
+                <tbody id="payment-history-body">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Check Admin Login
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+
+        const API_URL = 'http://127.0.0.1:5000/api';
+
+
+
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = 'index.html';
+        }
+
+        // Fetch Enquiries
+        async function loadEnquiries() {
+            try {
+                const res = await fetch(`${API_URL}/enquiries`);
+                const data = await res.json();
+                const grid = document.getElementById('enquiries-grid');
+                grid.innerHTML = '';
+                data.forEach(enq => {
+                    grid.innerHTML += `
+                        <div class="customer-card-box">
+                            <div class="customer-card-header" style="padding-bottom: 15px;">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 5px;">${enq.name}</h3>
+                                <p style="margin: 0; font-size: 0.85rem;"><i class="fas fa-phone"></i> ${enq.phone}</p>
+                                <span class="customer-id-badge">#${enq.id}</span>
+                            </div>
+                            <div class="customer-card-body" style="display: block; padding-top: 15px; max-height: none;">
+                                <div style="margin-bottom: 10px;">
+                                    <strong><i class="fas fa-map-marker-alt" style="color: var(--primary-green);"></i> Location:</strong><br>
+                                    <span style="font-size: 0.9rem; color: #475569;">${enq.location}</span>
+                                </div>
+                                <div style="margin-bottom: 20px;">
+                                    <strong><i class="fas fa-bolt" style="color: var(--primary-green);"></i> Requirement:</strong><br>
+                                    <span style="font-size: 0.9rem; color: #475569;">${enq.requirement}</span>
+                                </div>
+                                <button class="btn btn-blue" style="width: 100%; font-size: 0.9rem; padding: 10px;" onclick="fillCustomerForm('${enq.name}', '${enq.phone}')"><i class="fas fa-plus"></i> Convert to Customer</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function fillCustomerForm(name, phone) {
+            document.getElementById('c-name').value = name;
+            document.getElementById('c-phone').value = phone;
+            document.getElementById('c-username').value = phone; // default username is phone
+            document.getElementById('c-password').value = 'Sky123'; // default password
+            
+            // Scroll to form
+            document.getElementById('create-customer-form').scrollIntoView({behavior: 'smooth'});
+        }
+
+        // Create Customer
+        document.getElementById('create-customer-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('c-name').value,
+                phone: document.getElementById('c-phone').value,
+                branch: document.getElementById('c-branch').value,
+                username: document.getElementById('c-username').value,
+                password: document.getElementById('c-password').value
+            };
+            try {
+                const res = await fetch(`${API_URL}/customers`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    document.getElementById('create-customer-form').reset();
+                    loadCustomers();
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        // Fetch Customers & Manage Steps
+        async function loadCustomers() {
+            try {
+                const res = await fetch(`${API_URL}/customers`);
+                const data = await res.json();
+                const grid = document.getElementById('customers-grid');
+                grid.innerHTML = '';
+                
+                const options = ['Pending', 'In Progress', 'Completed', 'N/A'];
+                const stepLabels = [
+                    '1. Enquiry Received', '2. Site Inspection', '3. Quotation Approved',
+                    '4. PM Surya Ghar App', '5. Loan Applied', '6. Bank Verification',
+                    '7. Loan Disbursed', '8. DISCOM Approval', '9. Installation',
+                    '10. Net Meter Install', '11. Inspection', '12. Subsidy Request',
+                    '13. Subsidy Disbursed'
+                ];
+                
+                data.forEach(cust => {
+                    let card = `<div class="customer-card-box">
+                        <div class="customer-card-header">
+                            <h3>${cust.name}</h3>
+                            <p><i class="fas fa-phone"></i> ${cust.phone}</p>
+                            <span class="customer-id-badge">ID: ${cust.username}</span>
+                            <div class="toggle-btn" style="background: rgba(34, 197, 94, 0.4); margin-top: 10px;" onclick="openPaymentModal(${cust.id}, '${cust.name}')">Manage Payments <i class="fas fa-rupee-sign"></i></div>
+                            <div class="toggle-btn" onclick="toggleCard(this)">Manage Steps ▼</div>
+                        </div>
+                        <div class="customer-card-body">`;
+                    
+                    const stepNames = [
+                        'step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7',
+                        'step8', 'step9', 'step10', 'step11', 'step12', 'step13'
+                    ];
+                    
+                    stepNames.forEach((step, idx) => {
+                        let color = cust[step] === 'Completed' ? 'var(--primary-green)' : (cust[step] === 'In Progress' ? '#f59e0b' : (cust[step] === 'N/A' ? '#cbd5e1' : '#94a3b8'));
+                        
+                        let selects = `<select class="status-dropdown" onchange="updateStatus(${cust.id}, '${step}', this)" style="color: ${color}; border-color: ${color}; font-weight: 600;">`;
+                        options.forEach(opt => {
+                            selects += `<option value="${opt}" ${cust[step] === opt ? 'selected' : ''} style="color: black;">${opt}</option>`;
+                        });
+                        selects += `</select>`;
+                        
+                        card += `
+                            <div class="step-row">
+                                <label>${stepLabels[idx]}</label>
+                                ${selects}
+                            </div>
+                        `;
+                    });
+                    
+                    card += `</div></div>`;
+                    grid.innerHTML += card;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleCard(btn) {
+            const body = btn.parentElement.nextElementSibling;
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+                btn.innerHTML = 'Manage Steps ▼';
+            } else {
+                body.classList.add('open');
+                btn.innerHTML = 'Hide Steps ▲';
+            }
+        }
+
+        async function updateStatus(id, step, selectElement) {
+            const status = selectElement.value;
+            // Update UI color immediately
+            let color = status === 'Completed' ? 'var(--primary-green)' : (status === 'In Progress' ? '#f59e0b' : '#94a3b8');
+            selectElement.style.color = color;
+            selectElement.style.borderColor = color;
+            
+            try {
+                await fetch(`${API_URL}/customer/status`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id, step, status})
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // Portfolio Logic
+        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('title', document.getElementById('p-title').value);
+            formData.append('description', document.getElementById('p-desc').value);
+            formData.append('image', document.getElementById('p-image').files[0]);
+
+            try {
+                const res = await fetch(`${API_URL}/projects`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                alert(result.message);
+                if (result.success) {
+                    document.getElementById('add-project-form').reset();
+                    loadProjects();
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        async function loadProjects() {
+            try {
+                const res = await fetch(`${API_URL}/projects`);
+                const data = await res.json();
+                const grid = document.getElementById('portfolio-grid');
+                grid.innerHTML = '';
+                
+                data.forEach(proj => {
+                    grid.innerHTML += `
+                        <div class="customer-card-box">
+                            <img src="http://127.0.0.1:5000/uploads/${proj.image_path}" style="width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid var(--border);">
+                            <div class="customer-card-header" style="background: white; color: var(--dark-blue); padding: 15px;">
+                                <h3 style="font-size: 1.1rem; color: var(--dark-blue);">${proj.title}</h3>
+                                <p style="color: #64748b; font-size: 0.85rem; margin-top: 5px;">${proj.description}</p>
+                                <button onclick="deleteProject(${proj.id})" class="btn" style="background: #ef4444; width: 100%; margin-top: 15px; font-size: 0.85rem;">Delete Project</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteProject(id) {
+            if(!confirm("Are you sure you want to delete this project?")) return;
+            try {
+                const res = await fetch(`${API_URL}/projects/${id}`, { method: 'DELETE' });
+                const result = await res.json();
+                if(result.success) {
+                    loadProjects();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Switch tabs and close sidebar on mobile
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            // If called from sidebar, event.currentTarget will exist
+            if (event && event.currentTarget && event.currentTarget.classList) {
+                event.currentTarget.classList.add('active');
+            } else {
+                // Find matching nav item
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if(item.getAttribute('onclick').includes(tabId)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+            
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        let currentPayCustomerId = null;
+
+        async function openPaymentModal(id, name) {
+            currentPayCustomerId = id;
+            document.getElementById('payment-customer-name').innerText = `Customer: ${name}`;
+            document.getElementById('payment-modal').classList.add('active');
+            await loadPayments();
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.remove('active');
+            currentPayCustomerId = null;
+        }
+
+        async function saveTotalCost() {
+            const cost = document.getElementById('total-cost-input').value;
+            if(!cost) return;
+            try {
+                await fetch(`${API_URL}/customer/cost`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: currentPayCustomerId, cost: cost})
+                });
+                loadPayments();
+            } catch(e) { console.error(e); }
+        }
+
+        document.getElementById('add-payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                customer_id: currentPayCustomerId,
+                amount: document.getElementById('pay-amount').value,
+                mode: document.getElementById('pay-mode').value,
+                date: new Date().toISOString().split('T')[0],
+                description: document.getElementById('pay-desc').value
+            };
+            try {
+                await fetch(`${API_URL}/payments`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                document.getElementById('add-payment-form').reset();
+                loadPayments();
+            } catch(e) { console.error(e); }
+        });
+
+        async function loadPayments() {
+            if(!currentPayCustomerId) return;
+            try {
+                const res = await fetch(`${API_URL}/payments/${currentPayCustomerId}`);
+                const data = await res.json();
+                
+                const cost = parseFloat(data.total_cost) || 0;
+                document.getElementById('total-cost-input').value = cost > 0 ? cost : '';
+                
+                let paidCash = 0;
+                let paidBank = 0;
+                let totalPaid = 0;
+                
+                data.payments.forEach(pay => {
+                    const amt = parseFloat(pay.amount);
+                    totalPaid += amt;
+                    if(pay.mode === 'Cash') paidCash += amt;
+                    else paidBank += amt;
+                });
+                
+                const remaining = cost - totalPaid;
+                
+                const tbody = document.getElementById('payment-history-body');
+                tbody.innerHTML = '';
+                
+                data.payments.forEach(pay => {
+                    const amt = parseFloat(pay.amount);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pay.date}</td>
+                            <td style="font-weight: bold;">₹${amt.toLocaleString('en-IN')}</td>
+                            <td>${pay.mode}</td>
+                            <td>${pay.description}</td>
+                            <td><button class="btn btn-blue" style="font-size: 0.75rem; padding: 5px 10px;" onclick="downloadReceipt('${document.getElementById('payment-customer-name').innerText.split(': ')[1]}', ${amt}, '${pay.date}', '${pay.mode}', ${remaining})">Receipt</button></td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('sum-cost').innerText = `₹${cost.toLocaleString('en-IN')}`;
+                document.getElementById('sum-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+                document.getElementById('sum-rem').innerText = `₹${remaining.toLocaleString('en-IN')}`;
+                document.getElementById('sum-cash').innerText = `₹${paidCash.toLocaleString('en-IN')}`;
+                document.getElementById('sum-bank').innerText = `₹${paidBank.toLocaleString('en-IN')}`;
+                
+            } catch(e) { console.error(e); }
+        }
+
+        function downloadReceipt(name, amount, date, mode, remaining) {
+            function numberToWords(num) {
+                const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+                const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+                if ((num = num.toString()).length > 9) return 'overflow';
+                const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+                if (!n) return; let str = '';
+                str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+                str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+                str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+                str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+                str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+                return str.trim() + ' Rupees Only';
+            }
+            const amountWords = numberToWords(amount);
+            const logoUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/images/logo.png';
+            const receiptNo = 'REC-' + Math.floor(Math.random() * 100000);
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Payment Receipt</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #000; background: #fff; }
+                        .receipt-box { border: 1px solid #000; max-width: 800px; margin: 0 auto; box-sizing: border-box; }
+                        .flex-row { display: flex; }
+                        .border-bottom { border-bottom: 1px solid #000; }
+                        .border-right { border-right: 1px solid #000; }
+                        .border-top { border-top: 1px solid #000; }
+                        .padding-10 { padding: 10px; }
+                        .padding-15 { padding: 15px; }
+                        .center { text-align: center; }
+                        .right { text-align: right; }
+                        h2, h3, p { margin: 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt-box">
+                        <div class="border-bottom center padding-10">
+                            <h2 style="font-size: 18px; letter-spacing: 1px;">PAYMENT IN VOUCHER</h2>
+                        </div>
+                        
+                        <div class="flex-row border-bottom">
+                            <div class="padding-10 border-right" style="flex: 1;">
+                                <img src="${logoUrl}" alt="Logo" style="height: 50px; margin-bottom: 10px;">
+                                <h3 style="font-size: 16px; margin-bottom: 5px;">Sky Electrofab Solar</h3>
+                                <p style="font-size: 12px; line-height: 1.5; margin-bottom: 3px;">N-53, AH-1/5/7, Uttam Nagar, CIDCO, Nashik – 422009</p>
+                                <p style="font-size: 12px; line-height: 1.5;">Email: info@skyelectrofab.com<br>Contact: +91 8668651086</p>
+                            </div>
+                            <div class="padding-10" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                <table style="width: 100%; font-size: 13px;">
+                                    <tr><td style="width: 100px; padding: 5px 0;"><strong>Receipt No.</strong></td><td>: ${receiptNo}</td></tr>
+                                    <tr><td style="padding: 5px 0;"><strong>Date</strong></td><td>: ${date}</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="border-bottom padding-15">
+                            <p style="font-size: 13px; margin-bottom: 5px;"><strong>Customer Name:</strong></p>
+                            <h3 style="font-size: 18px; color: #333;">${name}</h3>
+                        </div>
+                        
+                        <div class="flex-row border-bottom" style="background: #f9f9f9; font-size: 14px; font-weight: bold;">
+                            <div class="padding-10 border-right" style="flex: 3; text-align: center;">Particulars</div>
+                            <div class="padding-10 center" style="flex: 1;">Amount</div>
+                        </div>
+                        
+                        <div class="flex-row" style="min-height: 150px; font-size: 14px;">
+                            <div class="padding-15 border-right" style="flex: 3;">
+                                <p style="margin-bottom: 15px;">Payment towards Solar Project Installation</p>
+                                <p style="font-style: italic; font-size: 13px; margin-bottom: 10px;">Payment Mode: ${mode}</p>
+                                <p style="font-size: 13px; color: #ef4444; font-weight: bold;">Current Pending Balance: ₹ ${remaining.toLocaleString('en-IN')}</p>
+                            </div>
+                            <div class="padding-15 right" style="flex: 1;">
+                                ₹ ${amount.toLocaleString('en-IN')}.00
+                            </div>
+                        </div>
+                        
+                        <div class="flex-row border-top border-bottom" style="font-size: 14px;">
+                            <div class="padding-10 border-right right" style="flex: 3; font-weight: bold;">Total Amount Received</div>
+                            <div class="padding-10 right" style="flex: 1; font-weight: bold;">₹ ${amount.toLocaleString('en-IN')}.00</div>
+                        </div>
+                        
+                        <div class="flex-row" style="font-size: 13px;">
+                            <div class="padding-15 border-right" style="flex: 2;">
+                                <p style="margin-bottom: 5px;"><strong>Amount (in words):</strong></p>
+                                <p style="font-style: italic;">${amountWords}</p>
+                            </div>
+                            <div class="padding-15 center" style="flex: 1;">
+                                <br><br><br>
+                                <p style="border-top: 1px dashed #000; padding-top: 5px; display: inline-block;"><strong>Authorised Signatory</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function generateQuotation() {
+            // Get values
+            const name = document.getElementById('q-name').value;
+            const phone = document.getElementById('q-phone').value;
+            const address = document.getElementById('q-address').value;
+            const date = document.getElementById('q-date').value;
+            
+            const capacity = document.getElementById('q-capacity').value;
+            const panel = document.getElementById('q-panel').value;
+            const inverter = document.getElementById('q-inverter').value;
+            const structure = document.getElementById('q-structure').value;
+            
+            const basePrice = parseFloat(document.getElementById('q-base-price').value) || 0;
+            const subsidy = parseFloat(document.getElementById('q-subsidy').value) || 0;
+            const finalPrice = basePrice - subsidy;
+            
+            if(!name || !capacity || !basePrice) {
+                alert("Please fill all required fields before generating quotation.");
+                return;
+            }
+
+            const logoUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + '/images/logo.png';
+            const quoteNo = 'QT-' + Math.floor(Math.random() * 100000);
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Quotation - ${name}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; line-height: 1.6; }
+                        .quote-box { max-width: 800px; margin: 0 auto; }
+                        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px; }
+                        .company-details h1 { color: #0f172a; margin: 0 0 5px 0; font-size: 24px; }
+                        .company-details p { margin: 0; font-size: 13px; color: #475569; }
+                        .quote-meta { text-align: right; }
+                        .quote-meta h2 { color: #22c55e; margin: 0 0 10px 0; font-size: 28px; letter-spacing: 1px; }
+                        .quote-meta p { margin: 0; font-size: 14px; font-weight: bold; }
+                        
+                        .client-section { background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+                        .client-section h3 { margin: 0 0 10px 0; color: #0f172a; font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+                        .client-section p { margin: 5px 0; font-size: 14px; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        th { background: #0f172a; color: white; text-align: left; padding: 12px; font-size: 14px; }
+                        td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 14px; }
+                        .total-row td { background: #f1f5f9; font-weight: bold; font-size: 16px; }
+                        .final-row td { background: #dcfce7; font-weight: bold; font-size: 18px; color: #166534; }
+                        
+                        .terms { font-size: 12px; color: #64748b; margin-top: 40px; }
+                        .terms h4 { color: #0f172a; margin-bottom: 10px; }
+                        .terms ul { padding-left: 20px; margin: 0; }
+                        
+                        .signature { margin-top: 60px; display: flex; justify-content: space-between; text-align: center; font-size: 14px; font-weight: bold; }
+                        .sign-line { border-top: 1px solid #333; padding-top: 10px; width: 200px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="quote-box">
+                        <div class="header">
+                            <div class="company-details">
+                                <img src="${logoUrl}" alt="Sky Electrofab Solar" style="height: 60px; margin-bottom: 10px;">
+                                <h1>Sky Electrofab Solar</h1>
+                                <p><strong>Nashik Main Branch:</strong> N-53, AH-1/5/7, Uttam Nagar</p>
+                                <p>CIDCO, Nashik – 422009</p>
+                                <p>Email: info@skyelectrofab.com | Contact: +91 8668651086</p>
+                            </div>
+                            <div class="quote-meta">
+                                <h2>QUOTATION</h2>
+                                <p>Quote No: ${quoteNo}</p>
+                                <p>Date: ${date}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="client-section">
+                            <h3>Prepared For:</h3>
+                            <p><strong>Name:</strong> ${name}</p>
+                            <p><strong>Address:</strong> ${address}</p>
+                            <p><strong>Contact:</strong> ${phone}</p>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Description / Component</th>
+                                    <th>Specification</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>System Capacity</strong></td>
+                                    <td>${capacity} kW Grid-Tied Solar System</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Solar Panels</strong></td>
+                                    <td>${panel}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Solar Inverter</strong></td>
+                                    <td>${inverter}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mounting Structure</strong></td>
+                                    <td>${structure}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Balance of System (BOS)</strong></td>
+                                    <td>AC/DC Cables, Earthing Kits, Lightning Arrester, ACDB/DCDB</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Services Included</strong></td>
+                                    <td>Installation, Commissioning, Net-Metering, MSEDCL Approvals</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Pricing Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total System Cost (Inclusive of all taxes & installation)</td>
+                                    <td style="text-align: right;">₹ ${basePrice.toLocaleString('en-IN')}.00</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #ef4444;">Estimated Government Subsidy (Direct to Customer Account)</td>
+                                    <td style="text-align: right; color: #ef4444;">- ₹ ${subsidy.toLocaleString('en-IN')}.00</td>
+                                </tr>
+                                <tr class="final-row">
+                                    <td>Effective Cost to Customer</td>
+                                    <td style="text-align: right;">₹ ${finalPrice.toLocaleString('en-IN')}.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="terms">
+                            <h4>Terms & Conditions:</h4>
+                            <ul>
+                                <li><strong>Validity:</strong> This quotation is valid for 15 days from the date of issue.</li>
+                                <li><strong>Payment Terms:</strong> 50% advance along with work order, 40% on delivery of materials, 10% on commissioning.</li>
+                                <li><strong>Warranty:</strong> 25 Years performance warranty on Solar Panels. Standard manufacturer warranty on Inverter (usually 5-10 years).</li>
+                                <li><strong>Subsidy:</strong> Subsidy amounts are subject to MNRE/MSEDCL guidelines and will be credited directly to the customer's bank account after successful installation and inspection.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="signature">
+                            <div class="sign-line">Customer Acceptance</div>
+                            <div class="sign-line">For Sky Electrofab Solar</div>
+                        </div>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        async function loadBranchPayments() {
+            try {
+                const res = await fetch(`${API_URL}/branch_summary`);
+                const data = await res.json();
+                
+                const selectElement = document.getElementById('branch-select');
+                const currentSelection = selectElement.value;
+                
+                // Extract unique branches
+                const branches = new Set(data.map(d => d.branch));
+                selectElement.innerHTML = '<option value="All">All Branches</option>';
+                branches.forEach(b => {
+                    selectElement.innerHTML += `<option value="${b}">${b}</option>`;
+                });
+                selectElement.value = currentSelection;
+                
+                let filteredData = data;
+                if (currentSelection !== 'All') {
+                    filteredData = data.filter(d => d.branch === currentSelection);
+                }
+                
+                // Sort so that accounts with pending > 0 are at the top
+                filteredData.sort((a, b) => b.remaining - a.remaining);
+                
+                let totalPending = 0;
+                let totalCost = 0;
+                let totalPaid = 0;
+                
+                const tbody = document.getElementById('branch-payments-body');
+                tbody.innerHTML = '';
+                
+                filteredData.forEach(cust => {
+                    totalPending += cust.remaining;
+                    totalCost += cust.total_cost;
+                    totalPaid += cust.total_paid;
+                    
+                    const pendingColor = cust.remaining > 0 ? '#ef4444' : 'var(--primary-green)';
+                    const pendingText = cust.remaining > 0 ? `₹${cust.remaining.toLocaleString('en-IN')}` : 'Settled';
+                    
+                    tbody.innerHTML += `
+                        <tr style="background: ${cust.remaining > 0 ? '#fef2f2' : 'white'};">
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border); font-weight: bold;">${cust.name}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border);">${cust.branch}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border);">₹${cust.total_cost.toLocaleString('en-IN')}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border); color: var(--primary-green); font-weight: bold;">₹${cust.total_paid.toLocaleString('en-IN')}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border); color: ${pendingColor}; font-weight: bold;">${pendingText}</td>
+                            <td style="padding: 15px; border-bottom: 1px solid var(--border);">
+                                <button class="btn btn-blue" style="font-size: 0.8rem; padding: 6px 12px;" onclick="openPaymentModal(${cust.id}, '${cust.name}')">Manage</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('branch-pending-total').innerText = `₹${totalPending.toLocaleString('en-IN')}`;
+                document.getElementById('branch-cost-total').innerText = `₹${totalCost.toLocaleString('en-IN')}`;
+                document.getElementById('branch-paid-total').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+                
+            } catch(e) { console.error("Error loading branch payments", e); }
+        }
+
+        loadEnquiries();
+        loadCustomers();
+        loadProjects();
+        loadBranchPayments();
+    </script>
+</body>
+</html>
