@@ -1,3 +1,8 @@
+// ============================================================
+// BACKEND API URL — Update this after deploying to Render
+// ============================================================
+const API_BASE = 'https://sky-electrofab-backend.onrender.com/api';
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Sticky Navbar
     const navbar = document.getElementById('navbar');
@@ -102,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = true;
                 
                 // Real submission to Backend
-                fetch('http://127.0.0.1:5000/api/enquiries', {
+                fetch(`${API_BASE}/enquiries`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({name, phone, location, requirement})
@@ -295,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const password = inputs[1].value;
 
                 try {
-                    const res = await fetch('http://127.0.0.1:5000/api/login/customer', {
+                    const res = await fetch(`${API_BASE}/login/customer`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({username, password})
@@ -323,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const password = inputs[1].value;
 
                 try {
-                    const res = await fetch('http://127.0.0.1:5000/api/login/admin', {
+                    const res = await fetch(`${API_BASE}/login/admin`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({username, password})
@@ -345,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 9. Load Dynamic Portfolio Projects
     const projectsGrid = document.querySelector('.projects-grid');
     if (projectsGrid) {
-        fetch('http://127.0.0.1:5000/api/projects')
+        fetch(`${API_BASE}/projects`)
             .then(res => res.json())
             .then(data => {
                 // Prepend so newest is first
