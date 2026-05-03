@@ -1,0 +1,40 @@
+{
+  "name": "Sky Electrofab Solar",
+  "short_name": "Sky Solar",
+  "description": "Affordable, reliable, and premium solar solutions for your home and business across Maharashtra.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Get a Quote",
+      "short_name": "Quote",
+      "description": "Request a solar installation quote",
+      "url": "/index.html#contact",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Our Projects",
+      "short_name": "Projects",
+      "description": "View our solar installation portfolio",
+      "url": "/projects.html",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
