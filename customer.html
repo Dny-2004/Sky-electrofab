@@ -336,7 +336,7 @@
         // Fetch latest data silently so user sees real-time updates when they refresh
         async function fetchLatestData() {
             try {
-                const res = await fetch('https://sky-electrofab-backend.onrender.com/api/login/customer', {
+                const res = await fetch('/api/login/customer', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({username: customer.username, password: customer.password})
@@ -354,7 +354,7 @@
 
         async function loadPayments() {
             try {
-                const res = await fetch(`https://sky-electrofab-backend.onrender.com/api/payments/${customer.id}`);
+                const res = await fetch(`/api/payments/${customer.id}`);
                 const data = await res.json();
                 
                 const cost = parseFloat(data.total_cost) || 0;

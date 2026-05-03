@@ -1,7 +1,5 @@
-// ============================================================
-// BACKEND API URL — Update this after deploying to Render
-// ============================================================
-const API_BASE = 'https://sky-electrofab-backend.onrender.com/api';
+// Backend API URL - uses relative path so it works on Vercel
+const API_BASE = '/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Sticky Navbar
