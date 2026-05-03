@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     card.className = 'project-card animate-on-scroll fade-up is-visible';
                     card.innerHTML = `
                         <div class="project-img-wrapper">
-                            <img src="http://127.0.0.1:5000/uploads/${proj.image_path}" alt="${proj.title}">
+                            <img src="/uploads/${proj.image_path}" alt="${proj.title}">
                             <div class="project-overlay">
                                 <h4>${proj.title}</h4>
                                 <p>${proj.description}</p>
